@@ -17,9 +17,13 @@ const sendMessage = async () => {
     console.log(data);
 
     // Menunggu 5 detik sebelum mengirim pesan lagi
-    setTimeout(sendMessage, 10000);
+    setTimeout(sendMessage, 5000);
   } catch (error) {
+    // Menangani kesalahan
     console.error('Error:', error);
+
+    // Menunggu 5 detik dan mencoba mengirim pesan lagi
+    setTimeout(sendMessage, 5000);
   }
 };
 
