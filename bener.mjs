@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const botToken = '6904604578:AAGBByAC7qGEhU-ExWVpvpnQEmeqZohLUJY';
 const chatId = '6974770156';
