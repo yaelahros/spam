@@ -42,20 +42,19 @@ const kirimFotoDenganCaption = async (botToken, chatId, photoUrl, caption) => {
       console.error('Gagal terkirim. Kesalahan:', data.description);
     }
   } catch (error) {
-    console.error('Timeout atau kesalahan lainnya. Kesalahan:', error.message);
+    console.error('Terjadi kesalahan:', error.message);
   }
 };
 
 const main = async () => {
   const { botToken, chatId, photoUrls, caption } = await getUserInput();
 
-  for (const photoUrl of photoUrls) {
-    await kirimFotoDenganCaption(botToken, chatId, photoUrl, caption);
-    await new Promise(resolve => setTimeout(resolve, 5000));  // Tunggu selama 5 detik
-  }
-
-  // Pastikan untuk menutup antarmuka pembacaan setelah selesai
-  rl.close();
+  // Menjalankan loop pengiriman pesan
+  setInterval(async () => {
+    for (const photoUrl of photoUrls) {
+      await kirimFotoDenganCaption(botToken, chatId, photoUrl, caption);
+    }
+  }, 5000);
 };
 
 main();
