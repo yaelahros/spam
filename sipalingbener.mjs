@@ -11,7 +11,6 @@ const getUserInput = async () => {
     rl.question('Masukkan token bot: ', (botToken) => {
       rl.question('Masukkan ID chat: ', (chatId) => {
         rl.question('Masukkan URL gambar, pisahkan dengan koma (,): ', (photoUrlsInput) => {
-          rl.close();
           const photoUrls = photoUrlsInput.split(',').map(url => url.trim());
           resolve({ botToken, chatId, photoUrls });
         });
@@ -44,21 +43,19 @@ const sendRandomPhoto = async (botToken, chatId, photoUrls) => {
       } else {
         console.error('Gagal terkirim bosku. Kesalahan:', data.description);
       }
-      
-      // Mengirim pesan kembali setelah selesai
-      sendRandomPhoto(botToken, chatId, photoUrls);
     } catch (error) {
       console.error('Timeout atau kesalahan lainnya. Kesalahan:', error.message);
-      // Mengirim pesan kembali setelah selesai, bahkan jika terjadi kesalahan
-      sendRandomPhoto(botToken, chatId, photoUrls);
     }
+
+    // Tunggu hingga proses selesai sebelum memanggil sendRandomPhoto lagi
+    setTimeout(() => sendRandomPhoto(botToken, chatId, photoUrls), 5000);
   });
 };
 
 const main = async () => {
   const { botToken, chatId, photoUrls } = await getUserInput();
 
-  // Mulai proses pengiriman pesan setelah mendapatkan input
+  // Mulai proses pengiriman pesan
   sendRandomPhoto(botToken, chatId, photoUrls);
 };
 
