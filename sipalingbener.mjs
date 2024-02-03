@@ -10,7 +10,11 @@ const getUserInput = async () => {
   return new Promise((resolve, reject) => {
     rl.question('Masukkan token bot: ', (botToken) => {
       rl.question('Masukkan ID chat: ', (chatId) => {
-        resolve({ botToken, chatId });
+        rl.question('Masukkan URL gambar, pisahkan dengan koma (,): ', (photoUrlsInput) => {
+          rl.close();
+          const photoUrls = photoUrlsInput.split(',').map(url => url.trim());
+          resolve({ botToken, chatId, photoUrls });
+        });
       });
     });
   });
@@ -40,24 +44,22 @@ const sendRandomPhoto = async (botToken, chatId, photoUrls) => {
       } else {
         console.error('Gagal terkirim bosku. Kesalahan:', data.description);
       }
+      
+      // Mengirim pesan kembali setelah selesai
+      sendRandomPhoto(botToken, chatId, photoUrls);
     } catch (error) {
       console.error('Timeout atau kesalahan lainnya. Kesalahan:', error.message);
+      // Mengirim pesan kembali setelah selesai, bahkan jika terjadi kesalahan
+      sendRandomPhoto(botToken, chatId, photoUrls);
     }
-
-    // Tunggu hingga proses selesai sebelum memanggil main() lagi
-    setImmediate(main);
   });
 };
 
 const main = async () => {
-  const { botToken, chatId } = await getUserInput();
+  const { botToken, chatId, photoUrls } = await getUserInput();
 
-  rl.question('Masukkan URL gambar, pisahkan dengan koma (,): ', (photoUrlsInput) => {
-    const photoUrls = photoUrlsInput.split(',').map(url => url.trim());
-
-    // Mulai proses pengiriman pesan setiap 5 detik
-    setInterval(() => sendRandomPhoto(botToken, chatId, photoUrls), 5000);
-  });
+  // Mulai proses pengiriman pesan setelah mendapatkan input
+  sendRandomPhoto(botToken, chatId, photoUrls);
 };
 
 main();
