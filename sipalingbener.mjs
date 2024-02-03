@@ -10,7 +10,6 @@ const getUserInput = async () => {
   return new Promise((resolve, reject) => {
     rl.question('Masukkan token bot: ', (botToken) => {
       rl.question('Masukkan ID chat: ', (chatId) => {
-        rl.close(); // Tutup antarmuka pembacaan setelah mendapatkan input
         resolve({ botToken, chatId });
       });
     });
@@ -44,6 +43,9 @@ const sendRandomPhoto = async (botToken, chatId, photoUrls) => {
     } catch (error) {
       console.error('Timeout atau kesalahan lainnya. Kesalahan:', error.message);
     }
+
+    // Tunggu hingga proses selesai sebelum memanggil main() lagi
+    setImmediate(main);
   });
 };
 
@@ -53,10 +55,8 @@ const main = async () => {
   rl.question('Masukkan URL gambar, pisahkan dengan koma (,): ', (photoUrlsInput) => {
     const photoUrls = photoUrlsInput.split(',').map(url => url.trim());
 
-    // Mengirim pesan setiap 5 detik
-    setInterval(async () => {
-      await sendRandomPhoto(botToken, chatId, photoUrls);
-    }, 5000);
+    // Mulai proses pengiriman pesan setiap 5 detik
+    setInterval(() => sendRandomPhoto(botToken, chatId, photoUrls), 5000);
   });
 };
 
