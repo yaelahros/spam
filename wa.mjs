@@ -6,21 +6,22 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-const getUserInput = async () => {
+const getUserInput = () => {
   return new Promise((resolve) => {
     rl.question('Masukkan token bot: ', (botToken) => {
       rl.question('Masukkan ID chat: ', (chatId) => {
         rl.question('Masukkan URL gambar, pisahkan dengan koma (,): ', (photoUrlsInput) => {
-          rl.close();
-          const photoUrls = photoUrlsInput.split(',').map(url => url.trim());
-          resolve({ botToken, chatId, photoUrls });
+          rl.question('Masukkan caption: ', (caption) => {
+            const photoUrls = photoUrlsInput.split(',').map(url => url.trim());
+            resolve({ botToken, chatId, photoUrls, caption });
+          });
         });
       });
     });
   });
 };
 
-const sendPhotoWithCaption = async (botToken, chatId, photoUrl, caption) => {
+const kirimFotoDenganCaption = async (botToken, chatId, photoUrl, caption) => {
   const apiUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
 
   try {
@@ -46,13 +47,15 @@ const sendPhotoWithCaption = async (botToken, chatId, photoUrl, caption) => {
 };
 
 const main = async () => {
-  const { botToken, chatId, photoUrls } = await getUserInput();
+  const { botToken, chatId, photoUrls, caption } = await getUserInput();
 
-  rl.question('Masukkan caption: ', (caption) => {
-    photoUrls.forEach(async (photoUrl) => {
-      await sendPhotoWithCaption(botToken, chatId, photoUrl, caption);
-    });
-  });
+  for (const photoUrl of photoUrls) {
+    await kirimFotoDenganCaption(botToken, chatId, photoUrl, caption);
+    await new Promise(resolve => setTimeout(resolve, 5000));  // Tunggu selama 5 detik
+  }
+
+  // Pastikan untuk menutup antarmuka pembacaan setelah selesai
+  rl.close();
 };
 
 main();
