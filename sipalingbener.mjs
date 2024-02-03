@@ -10,7 +10,7 @@ const getUserInput = async () => {
   return new Promise((resolve, reject) => {
     rl.question('Masukkan token bot: ', (botToken) => {
       rl.question('Masukkan ID chat: ', (chatId) => {
-        rl.close();
+        rl.close(); // Tutup antarmuka pembacaan setelah mendapatkan input
         resolve({ botToken, chatId });
       });
     });
