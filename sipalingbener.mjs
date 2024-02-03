@@ -12,6 +12,7 @@ const getUserInput = async () => {
       rl.question('Masukkan ID chat: ', (chatId) => {
         rl.question('Masukkan URL gambar, pisahkan dengan koma (,): ', (photoUrlsInput) => {
           const photoUrls = photoUrlsInput.split(',').map(url => url.trim());
+          rl.close();
           resolve({ botToken, chatId, photoUrls });
         });
       });
@@ -23,40 +24,33 @@ const sendRandomPhoto = async (botToken, chatId, photoUrls) => {
   const randomIndex = Math.floor(Math.random() * photoUrls.length);
   const randomPhotoUrl = photoUrls[randomIndex];
 
-  rl.question('Masukkan caption: ', async (caption) => {
-    const apiUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
+  const apiUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          photo: randomPhotoUrl,
-          caption: caption
-        }),
-      });
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        photo: randomPhotoUrl,
+        caption: 'Berhasil boskuuu ilmu padi'  // Tambahkan caption yang diinginkan di sini
+      }),
+    });
 
-      const data = await response.json();
-      if (data.ok) {
-        console.log('Berhasil boskuuu ilmu padi');
-      } else {
-        console.error('Gagal terkirim bosku. Kesalahan:', data.description);
-      }
-    } catch (error) {
-      console.error('Timeout atau kesalahan lainnya. Kesalahan:', error.message);
+    const data = await response.json();
+    if (!data.ok) {
+      console.error('Gagal terkirim bosku. Kesalahan:', data.description);
     }
-
-    // Tunggu hingga proses selesai sebelum memanggil sendRandomPhoto lagi
-    setTimeout(() => sendRandomPhoto(botToken, chatId, photoUrls), 5000);
-  });
+  } catch (error) {
+    console.error('Timeout atau kesalahan lainnya. Kesalahan:', error.message);
+  }
 };
 
 const main = async () => {
   const { botToken, chatId, photoUrls } = await getUserInput();
 
-  // Mulai proses pengiriman pesan
-  sendRandomPhoto(botToken, chatId, photoUrls);
+  // Mulai proses pengiriman pesan setiap 5 detik
+  setInterval(() => sendRandomPhoto(botToken, chatId, photoUrls), 5000);
 };
 
 main();
